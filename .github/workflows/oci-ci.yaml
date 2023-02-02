@@ -1,0 +1,96 @@
+---
+name: OCI Image CI
+on:
+  workflow_call:
+    inputs:
+      publish:
+        type: boolean
+        default: false
+        description: Set to true to publish the OCI Image produced by this workflow.
+      docker-compose-service:
+        type: string
+        description: The docker compose service providing the CI executables validate, build and publish
+      workload_identity_provider:
+        type: string
+      service_account:
+        type: string
+    secrets:
+      REVIEWBOT_GITHUB_TOKEN:
+        required: true
+    outputs:
+      image:
+        value: ${{ jobs.oci-ci.outputs.image }}
+        description: The full OCI Image reference.
+      image_tag:
+        value: ${{ jobs.oci-ci.outputs.image_tag }}
+        description: The OCI Image tag.
+defaults:
+  run:
+    shell: bash
+env:
+  XDG_CACHE_HOME: ${{ github.workspace }}/.cache/xdg
+jobs:
+  oci-ci:
+    name: OCI Image CI
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      packages: read
+    outputs:
+      image: ${{ steps.metadata.outputs.image }}
+      image_tag: ${{ steps.metadata.outputs.image_tag }}
+      image_digest: ${{ steps.metadata.outputs.image_digest }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Cache xdg
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.XDG_CACHE_HOME }}
+          key: xdg-${{ github.job }}-v1-${{ hashFiles('./**/*Dockerfile*', './**/go.sum') }}
+          restore-keys: |
+            xdg-${{ github.job }}-v1
+            xdg-${{ github.job }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Configure access to internal and private GitHub repos
+        run: git config --global url."https://${{ secrets.REVIEWBOT_GITHUB_TOKEN }}:x-oauth-basic@github.com/coopnorge".insteadOf "https://github.com/coopnorge"
+      - name: Build devtools
+        run: docker compose build
+      - name: Validate
+        run: docker compose run --rm ${{ inputs.docker-compose-service }} validate VERBOSE=all
+      - name: Build
+        run: docker compose run --rm ${{ inputs.docker-compose-service }} build VERBOSE=all
+      - name: Autenticate with GCP
+        if: ${{ inputs.publish }}
+        uses: "google-github-actions/auth@v1.0.0"
+        with:
+          workload_identity_provider: ${{ inputs.workload_identity_provider }}
+          service_account: ${{ inputs.service_account }}
+          create_credentials_file: true
+      - name: Configure Google Cloud Artifact Registry for Docker
+        if: ${{ inputs.publish }}
+        run: gcloud auth print-access-token | docker login https://europe-docker.pkg.dev -u oauth2accesstoken --password-stdin
+      - name: Publish
+        if: ${{ inputs.publish }}
+        run: docker compose run --rm ${{ inputs.docker-compose-service }} publish VERBOSE=all
+      - name: Output Image Metadata
+        id: metadata
+        run: |
+          IMAGE_NAME=$(docker compose run --rm ${{ inputs.docker-compose-service }} yq '.["image.name"]' oci-metadata.json)
+          IMAGE_NAME=${IMAGE_NAME##*,}
+          TAG=${IMAGE_NAME##*:}
+          echo "image=${IMAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "image_tag=${TAG}" >> $GITHUB_OUTPUT
+      - name: Fix cache permissions
+        run: |
+          sudo chown -R $(id -u):$(id -g) "${XDG_CACHE_HOME}"
+          sudo chmod -R ugo+rX "${XDG_CACHE_HOME}"
