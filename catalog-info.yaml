@@ -1,0 +1,12 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: github-workflow-devtools-build-oci
+  title: Devtools build OCI Workflow
+  annotations:
+    github.com/project-slug: coopnorge/github-workflow-devtools-build-oci
+    backstage.io/techdocs-ref: dir:.
+spec:
+  type: library
+  lifecycle: experimental
+  owner: engineering

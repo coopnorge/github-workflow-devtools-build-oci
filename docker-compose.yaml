@@ -1,0 +1,31 @@
+# https://docs.docker.com/compose/compose-file/compose-file-v3/
+version: "3"
+
+services:
+  techdocs:
+    build:
+      context: docker-compose
+      dockerfile: Dockerfile
+      target: techdocs
+    working_dir: /content
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS:-}
+      GCLOUD_PROJECT: ${GCLOUD_PROJECT:-}
+    volumes:
+      - .:/content
+      - ${XDG_CACHE_HOME:-xdg-cache-home}:/root/.cache
+      - $HOME/.config/gcloud:/root/.config/gcloud
+      - ${GOOGLE_APPLICATION_CREDENTIALS:-nothing}:${GOOGLE_APPLICATION_CREDENTIALS:-/tmp/empty-GOOGLE_APPLICATION_CREDENTIALS}
+    ports:
+      - "127.0.0.1:3000:3000/tcp"
+      - "127.0.0.1:41883:41883/tcp"
+      - "127.0.0.1:8000:8000/tcp"
+      - "127.0.0.1:41888:41888/tcp"
+    command: serve
+volumes:
+  xdg-cache-home: { }
+  dot-venv: { }
+  devtools-stamps: { }
+  node-modules: { }
+  dot-temp: { }
+  nothing: { }

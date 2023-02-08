@@ -1,9 +1,5 @@
-# github-workflows-template
+# Build OCI GitHub Actions Workflow
 
-Steps:
-
-1. update / rename `.github/workflows/example-workflow.yaml`
-2. A README describing
-   * what the workflow does
-   * which input variables 
-   * an example
+Usage docs:
+<https://inventory.internal.coop/docs/default/component/github-workflow-devtools-build-oci>
+or [./docs](./docs).
