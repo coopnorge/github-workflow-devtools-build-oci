@@ -113,10 +113,6 @@ services:
       context: docker-compose
       target: golang-devtools
       dockerfile: Dockerfile
-      cache_from:
-        - "type=local,src=${XDG_CACHE_HOME:-$HOME/.cache}/docker-compose,ignore-error=true"
-      cache_to:
-        - "type=local,dest=${XDG_CACHE_HOME:-$HOME/.cache}/docker-compose"
     privileged: true
     security_opt:
       - seccomp:unconfined
