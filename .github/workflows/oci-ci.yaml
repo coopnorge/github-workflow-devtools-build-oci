@@ -14,6 +14,10 @@ on:
         type: string
       service_account:
         type: string
+      xdg_cache_hash:
+        type: string
+        default: ""
+        description: The path argument for the GitHub Actions function hashFiles.
     secrets:
       REVIEWBOT_GITHUB_TOKEN:
         required: true
@@ -48,13 +52,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Cache xdg
+        if: ${{ inputs.xdg_cache_hash != '' }}
         uses: actions/cache@v3
         with:
           path: ${{ env.XDG_CACHE_HOME }}
-          key: xdg-${{ github.job }}-v1-${{ hashFiles('./**/*Dockerfile*', './**/go.sum') }}
+          key: xdg-${{ github.repository }}-${{ github.job }}-${{ inputs.xdg_cache_hash }}
           restore-keys: |
-            xdg-${{ github.job }}-v1
-            xdg-${{ github.job }}
+            xdg-${{ github.repository }}-${{ github.job }}-${{ inputs.xdg_cache_hash }}
+            xdg-${{ github.repository }}-${{ github.job }}-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
@@ -91,6 +96,7 @@ jobs:
           echo "image=${IMAGE_NAME}" >> $GITHUB_OUTPUT
           echo "image_tag=${TAG}" >> $GITHUB_OUTPUT
       - name: Fix cache permissions
+        if: ${{ inputs.xdg_cache_hash != '' }}
         run: |
           sudo chown -R $(id -u):$(id -g) "${XDG_CACHE_HOME}"
           sudo chmod -R ugo+rX "${XDG_CACHE_HOME}"

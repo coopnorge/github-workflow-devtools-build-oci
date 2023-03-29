@@ -16,6 +16,7 @@ The example uses our Go Lang devtools.
 | `docker-compose-service`     | string  | required | N/A     | The docker compose service providing the CI executables validate, build and publish.                     |
 | `workload_identity_provider` | string  | required | N/A     | |
 | `service_account`            | string  | required | N/A     | |
+| `xdg_cache_hash`             | string  | optional | `""`    | The cache lookup hash, use [`hashFiles`](https://docs.github.com/en/actions/learn-github-actions/expressions#hashfiles) to generate a hash from the relevant files |
 
 ### Outputs
 
