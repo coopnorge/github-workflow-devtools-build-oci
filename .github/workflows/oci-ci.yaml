@@ -90,7 +90,7 @@ jobs:
       - name: Output Image Metadata
         id: metadata
         run: |
-          IMAGE_NAME=$(docker compose run --rm ${{ inputs.docker-compose-service }} yq '.["image.name"]' oci-metadata.json)
+          IMAGE_NAME=$(docker compose run --rm ${{ inputs.docker-compose-service }} yq --output-format=yaml '.["image.name"]' oci-metadata.json)
           IMAGE_NAME=${IMAGE_NAME##*,}
           TAG=${IMAGE_NAME##*:}
           echo "image=${IMAGE_NAME}" >> $GITHUB_OUTPUT
