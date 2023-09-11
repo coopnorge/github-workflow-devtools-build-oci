@@ -69,7 +69,7 @@ jobs:
       - name: Configure access to internal and private GitHub repos
         run: git config --global url."https://${{ secrets.REVIEWBOT_GITHUB_TOKEN }}:x-oauth-basic@github.com/coopnorge".insteadOf "https://github.com/coopnorge"
       - name: Build devtools
-        run: docker compose build
+        run: docker compose build ${{ inputs.docker-compose-service }}
       - name: Validate
         run: docker compose run --rm ${{ inputs.docker-compose-service }} validate VERBOSE=all
       - name: Build
