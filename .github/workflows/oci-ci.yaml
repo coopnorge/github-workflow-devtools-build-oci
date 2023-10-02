@@ -3,6 +3,10 @@ name: OCI Image CI
 on:
   workflow_call:
     inputs:
+      artifact_registry_location:
+        type: string
+        default: "europe"
+        description: Artifact registry region name (e.g. "europe", "europe-north1").
       publish:
         type: boolean
         default: false
@@ -83,7 +87,7 @@ jobs:
           create_credentials_file: true
       - name: Configure Google Cloud Artifact Registry for Docker
         if: ${{ inputs.publish }}
-        run: gcloud auth print-access-token | docker login https://europe-docker.pkg.dev -u oauth2accesstoken --password-stdin
+        run: gcloud auth print-access-token | docker login https://${{ inputs.artifact_registry_location }}-docker.pkg.dev -u oauth2accesstoken --password-stdin
       - name: Publish
         if: ${{ inputs.publish }}
         run: docker compose run --rm ${{ inputs.docker-compose-service }} publish VERBOSE=all
