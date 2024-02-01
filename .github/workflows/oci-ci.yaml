@@ -7,6 +7,9 @@ on:
         type: string
         default: "europe"
         description: Artifact registry region name (e.g. "europe", "europe-north1").
+      environment:
+        type: string
+        description: The environment name to use. If set variables will be loaded from env.$(ENVIRONMENT)
       publish:
         type: boolean
         default: false
@@ -75,9 +78,9 @@ jobs:
       - name: Build devtools
         run: docker compose build ${{ inputs.docker-compose-service }}
       - name: Validate
-        run: docker compose run --rm ${{ inputs.docker-compose-service }} validate VERBOSE=all
+        run: docker compose run --rm ${{ inputs.docker-compose-service }} validate VERBOSE=all ENVIRONMENT=${{ inputs.environment }}
       - name: Build
-        run: docker compose run --rm ${{ inputs.docker-compose-service }} build VERBOSE=all
+        run: docker compose run --rm ${{ inputs.docker-compose-service }} build VERBOSE=all ENVIRONMENT=${{ inputs.environment }}
       - name: Autenticate with GCP
         if: ${{ inputs.publish }}
         uses: "google-github-actions/auth@v2.1.0"
