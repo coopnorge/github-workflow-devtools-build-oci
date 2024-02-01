@@ -93,7 +93,7 @@ jobs:
         run: gcloud auth print-access-token | docker login https://${{ inputs.artifact_registry_location }}-docker.pkg.dev -u oauth2accesstoken --password-stdin
       - name: Publish
         if: ${{ inputs.publish }}
-        run: docker compose run --rm ${{ inputs.docker-compose-service }} publish VERBOSE=all
+        run: docker compose run --rm ${{ inputs.docker-compose-service }} publish VERBOSE=all ENVIRONMENT=${{ inputs.environment }}
       - name: Output Image Metadata
         id: metadata
         run: |
