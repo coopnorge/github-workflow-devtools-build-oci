@@ -17,4 +17,4 @@ jobs:
       pull-requests: write
       contents: write
     uses: >-
-      coopnorge/github-workflow-release-drafter/.github/workflows/release-drafter.yaml@v0.1.0
+      coopnorge/github-workflow-release-drafter/.github/workflows/release-drafter.yaml@v0.5.0
