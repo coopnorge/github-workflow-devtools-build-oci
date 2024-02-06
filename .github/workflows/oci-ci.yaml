@@ -83,7 +83,7 @@ jobs:
         run: docker compose run --rm ${{ inputs.docker-compose-service }} build VERBOSE=all ENVIRONMENT=${{ inputs.environment }}
       - name: Autenticate with GCP
         if: ${{ inputs.publish }}
-        uses: "google-github-actions/auth@v2.1.0"
+        uses: "google-github-actions/auth@v2.1.1"
         with:
           workload_identity_provider: ${{ inputs.workload_identity_provider }}
           service_account: ${{ inputs.service_account }}
