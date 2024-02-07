@@ -25,6 +25,10 @@ on:
         type: string
         default: ""
         description: The path argument for the GitHub Actions function hashFiles.
+      tags:
+        type: string
+        default: ""
+        description: The tags (separated by space) to use for the image.
     secrets:
       REVIEWBOT_GITHUB_TOKEN:
         required: true
@@ -80,7 +84,7 @@ jobs:
       - name: Validate
         run: docker compose run --rm ${{ inputs.docker-compose-service }} validate VERBOSE=all ENVIRONMENT=${{ inputs.environment }}
       - name: Build
-        run: docker compose run --rm ${{ inputs.docker-compose-service }} build VERBOSE=all ENVIRONMENT=${{ inputs.environment }}
+        run: docker compose run --rm ${{ inputs.docker-compose-service }} build VERBOSE=all ENVIRONMENT=${{ inputs.environment }} oci_tag_suffixes_git="${{ inputs.tags }}"
       - name: Autenticate with GCP
         if: ${{ inputs.publish }}
         uses: "google-github-actions/auth@v2.1.1"
@@ -91,6 +95,9 @@ jobs:
       - name: Configure Google Cloud Artifact Registry for Docker
         if: ${{ inputs.publish }}
         run: gcloud auth print-access-token | docker login https://${{ inputs.artifact_registry_location }}-docker.pkg.dev -u oauth2accesstoken --password-stdin
+      - name: Publish with Tag
+        if: ${{ inputs.publish && inputs.tags != ''}}
+        run: docker compose run --rm ${{ inputs.docker-compose-service }} publish VERBOSE=all ENVIRONMENT=${{ inputs.environment }} oci_tag_suffixes_git="${{ inputs.tags }}"
       - name: Publish
         if: ${{ inputs.publish }}
         run: docker compose run --rm ${{ inputs.docker-compose-service }} publish VERBOSE=all ENVIRONMENT=${{ inputs.environment }}
