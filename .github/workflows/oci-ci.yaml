@@ -87,7 +87,7 @@ jobs:
         run: docker compose run --rm ${{ inputs.docker-compose-service }} build VERBOSE=all ENVIRONMENT=${{ inputs.environment }} oci_tag_suffixes_git="${{ inputs.tags }}"
       - name: Autenticate with GCP
         if: ${{ inputs.publish }}
-        uses: "google-github-actions/auth@v2.1.3"
+        uses: "google-github-actions/auth@v2.1.4"
         with:
           workload_identity_provider: ${{ inputs.workload_identity_provider }}
           service_account: ${{ inputs.service_account }}
