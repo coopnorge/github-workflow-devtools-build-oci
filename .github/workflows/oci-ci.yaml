@@ -84,7 +84,7 @@ jobs:
       - name: Validate
         run: docker compose run --rm ${{ inputs.docker-compose-service }} validate VERBOSE=all ENVIRONMENT=${{ inputs.environment }}
       - name: Build
-        run: docker compose run --rm ${{ inputs.docker-compose-service }} build VERBOSE=all ENVIRONMENT=${{ inputs.environment }} oci_tag_suffixes_git="${{ inputs.tags }}"
+        run: docker compose run --rm ${{ inputs.docker-compose-service }} build VERBOSE=all ENVIRONMENT=${{ inputs.environment }} OCI_TAG_SUFFIX_USER="${{ inputs.tags }}"
       - name: Autenticate with GCP
         if: ${{ inputs.publish }}
         uses: "google-github-actions/auth@v2.1.8"
@@ -97,7 +97,7 @@ jobs:
         run: gcloud auth print-access-token | docker login https://${{ inputs.artifact_registry_location }}-docker.pkg.dev -u oauth2accesstoken --password-stdin
       - name: Publish with Tag
         if: ${{ inputs.publish && inputs.tags != ''}}
-        run: docker compose run --rm ${{ inputs.docker-compose-service }} publish VERBOSE=all ENVIRONMENT=${{ inputs.environment }} oci_tag_suffixes_git="${{ inputs.tags }}"
+        run: docker compose run --rm ${{ inputs.docker-compose-service }} publish VERBOSE=all ENVIRONMENT=${{ inputs.environment }} OCI_TAG_SUFFIX_USER="${{ inputs.tags }}"
       - name: Publish
         if: ${{ inputs.publish }}
         run: docker compose run --rm ${{ inputs.docker-compose-service }} publish VERBOSE=all ENVIRONMENT=${{ inputs.environment }}
