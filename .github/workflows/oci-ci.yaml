@@ -1,4 +1,3 @@
----
 name: OCI Image CI
 on:
   workflow_call:
@@ -47,7 +46,7 @@ env:
 jobs:
   oci-ci:
     name: OCI Image CI
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       id-token: write
