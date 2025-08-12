@@ -18,4 +18,4 @@ jobs:
       contents: write
       issues: write
     uses: >-
-      coopnorge/github-workflow-release-drafter/.github/workflows/release-drafter.yaml@v0.8.0
+      coopnorge/github-workflow-release-drafter/.github/workflows/release-drafter.yaml@v0.9.0
