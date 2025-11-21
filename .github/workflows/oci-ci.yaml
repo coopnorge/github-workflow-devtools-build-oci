@@ -56,7 +56,7 @@ jobs:
       image_tag: ${{ steps.metadata.outputs.image_tag }}
       image_digest: ${{ steps.metadata.outputs.image_digest }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Set up QEMU
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # pin@v3
       - name: Set up Docker Buildx
