@@ -63,7 +63,7 @@ jobs:
         uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # pin@v3
       - name: Cache xdg
         if: ${{ inputs.xdg_cache_hash != '' }}
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ env.XDG_CACHE_HOME }}
           key: xdg-${{ github.repository }}-${{ github.job }}-${{ inputs.xdg_cache_hash }}
