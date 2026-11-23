@@ -1,5 +1,21 @@
 # Build OCI Image GitHub Actions Workflow
 
+> [!IMPORTANT]
+>
+> This workflow is deprecated. It depends on the devtools images in
+> [engineering-docker-images](https://github.com/coopnorge/engineering-docker-images)
+> (one docker compose service per repo), which are being deleted. The workflow
+> will be removed together with them. Progress is tracked in
+> <https://github.com/coopnorge/engineering-docker-images/issues/4456>.
+>
+> Go repositories can move now: use
+> [`goapp.yaml`](https://github.com/coopnorge/mage/blob/main/.github/workflows/goapp.yaml)
+> from `coopnorge/mage`, which builds and pushes the app image. Libraries use
+> [`mage.yaml`](https://github.com/coopnorge/mage/blob/main/.github/workflows/mage.yaml).
+> There is no generic mage replacement for other stacks yet, so those
+> repositories have no migration path today. That work is tracked in
+> <https://github.com/coopnorge/mage/issues/923>.
+
 The workflow will validate, build and optionally public an OCI Image. The
 workflow requires a devtools compliant OCI Image with the executables
 `validate`, `build` and `publish`.
@@ -10,28 +26,27 @@ The example uses our Go Lang devtools.
 
 ### Inputs
 
-| Name                         | Type    | Required | Default | Description |
-|------------------------------|---------|----------|---------|-------------|
-| `publish`                    | boolean | optional | `false` | Set to true to publish the OCI Image produced by this workflow. |
-| `docker-compose-service`     | string  | required | N/A     | The docker compose service providing the CI executables validate, build and publish.                     |
-| `workload_identity_provider` | string  | required | N/A     | |
-| `service_account`            | string  | required | N/A     | |
-| `xdg_cache_hash`             | string  | optional | `""`    | The cache lookup hash, use [`hashFiles`](https://docs.github.com/en/actions/learn-github-actions/expressions#hashfiles) to generate a hash from the relevant files |
+|  Name                        |  Type   |  Required | Default | Description                                                                                                                                                        |
+| ---------------------------- | ------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `publish`                    | boolean | optional  | `false` | Set to true to publish the OCI Image produced by this workflow.                                                                                                    |
+| `docker-compose-service`     | string  | required  | N/A     | The docker compose service providing the CI executables validate, build and publish.                                                                               |
+| `workload_identity_provider` | string  | required  | N/A     |                                                                                                                                                                    |
+| `service_account`            | string  | required  | N/A     |                                                                                                                                                                    |
+| `xdg_cache_hash`             | string  | optional  |  `""`   | The cache lookup hash, use [`hashFiles`](https://docs.github.com/en/actions/learn-github-actions/expressions#hashfiles) to generate a hash from the relevant files |
 
 ### Outputs
 
-| Name        | Type   | Description                            |
-|-------------|--------|----------------------------------------|
+|  Name       |  Type  |  Description                           |
+| ----------- | ------ | -------------------------------------- |
 | `image`     | string | The full OCI Image reference with tag. |
-| `image_tag` | string | The OCI Image tag.                     |
+| `image_tag` | string |  The OCI Image tag.                    |
 
 ### Workflow configuration
 
 ```yaml title=".github/workflows/cicd.yaml"
 ---
 name: CI/CD
-on:
-  push
+on: push
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -138,7 +153,7 @@ services:
 networks:
   default:
 volumes:
-    xdg-cache-home: {}
+  xdg-cache-home: {}
 ```
 
 ### Docker compose Dockerfile
@@ -146,6 +161,11 @@ volumes:
 ```Dockerfile title="docker-compose/Dockerfile"
 FROM ghcr.io/coopnorge/engineering-docker-images/e0/devtools-golang-v1beta1:latest@sha256:07d1f3058917c93ed51a2d8bc3bfefe6008e5132282b259327462127d781f2ba AS golang-devtools
 ```
+
+> [!IMPORTANT]
+>
+> The `devtools-golang-v1beta1` image in this example is deprecated and will be
+> deleted. The example stays to document the current behaviour.
 
 ### devtools Environment Configuration
 
